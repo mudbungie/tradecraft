@@ -1,0 +1,54 @@
+Spy games
+    This is an ARG, played with your smartphone. One of the points is that
+    it is clandestine, and identifying other players is usually to the 
+    of the identified player. 
+
+
+    Your app gives you missions:
+        "Walk between these locations."
+        "Visit three burrito shops"
+        "Take pictures of ten blue cars"
+        "Stand in a park for fifteen minutes"
+    Other people are alerted about objectives:
+        "Operatives are going to go to these locations."
+        "There are three operatives in this park. Find them."
+        Bribery mission:
+            buy an agent a coffee
+            tip 100% to an agent
+    Sell T-Shirts, hats with QR codes on them. Also, armbands, coasters, etc
+
+    Bluetooth pairing: 
+        Phones connect to one another by scanning for bluetooth connections.
+        No contact: people manage to pair phones by getting close enough
+        
+    Image recognition:
+        At the beginning of the day, your first mission is to "meet an agent"
+            You will take three pictures of the other person, and are inducted into the system
+            Image recognition describes the player
+            Later, people are targetted using the description.
+            You can take pictures of suspected agents, and the game will evaluate whether or not it's the same person.
+            Morse code communications:
+                use a camera flash and camera on sender/receiver
+            QR codes are used for information handoffs
+
+            Fix a QR code, and then have someone else scan it?
+            Deliver QR codes to players, which can be scanned by other players for points. (They're stickers)
+                When people scan them, they gain points. The recipient also gets a small number of points for each person who scans one they place.
+            If someone takes a picture of you placing a QR code, they can "blackmail" you
+                App sends you a picture, you can give up ownership of the placed code.
+                Sell "bombs", which take points from scanners, and give you more points.
+                    Bombs can be "defused" by coloring in missing pixels with a sharpie,
+                        making them harmless, and getting you points. 
+                Possible to encode location information into 
+    Services required:
+        Going to have to have a client-server relationship with the app.
+        Server:
+            Maintains user enrollment
+                Registration is public
+                Get user email, send a link, make sure it gets clicked
+        Client:
+            Android app
+            on boot, attempts registration/login
+            Maintains local sqlitedb
+            Should operate with screen off, since game is clandestine in nature
+            There is a 
