@@ -52,3 +52,17 @@ Spy games
             Maintains local sqlitedb
             Should operate with screen off, since game is clandestine in nature
             There is a 
+
+
+basic app login schema:
+    client posts email to /register
+    server returns True if new user, False if already in the system
+    case True:
+        user provides password
+        client submits username/password to server
+        server records username/pwhash
+        server sends confirmation
+        user clicks confirmation
+        account is active
+    case False:
+        ask for account recovery
