@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+from . import api
 import pkg_resources
 
 try:
