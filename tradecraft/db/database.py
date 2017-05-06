@@ -18,3 +18,13 @@ class Database:
         self.connection = sqla.create_engine(connectionString)
         self.metadata = sqla.MetaData(self.connection)
         self.metadata.reflect()
+        
+    def initTable(self, tableName):
+        table = sqla.Table(tableName, self.metadata, autoload=True,
+            autoload_with=self.connection)
+        return table
+
+    def initTables(self, tableNames):
+        self.tables = {}
+        for tableName in tableNames:
+            self.tables[tableName] = self.initTable(tableName)
