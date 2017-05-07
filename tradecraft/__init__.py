@@ -1,4 +1,5 @@
 from . import api
+from . import db
 import pkg_resources
 
 try:
