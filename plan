@@ -66,3 +66,11 @@ basic app login schema:
         account is active
     case False:
         ask for account recovery
+
+database schema:
+    users:
+        user_id
+        email
+        pwhash
+        registration_date
+        email_confirmed
