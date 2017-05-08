@@ -1,22 +1,22 @@
-impot sqlalchemy as sqla
+import sqlalchemy as sqla
 from datetime import datetime
 from hashlib import sha512
 
-from database import Base
-from database import Session
+from tradecraft.db.database import Base
+from tradecraft.db.database import session
 
 class User(Base):
     __tablename__ = 'users'
 
-    id = Column(sqla.BigInteger, primary_key=True)
-    email = Column(sqla.String, unique=True)
-    alias = Column(sqla.String)
-    pwhash = Column(sqla.String)
-    registration_date = Column(sqla.DateTime)
+    id = sqla.Column(sqla.BigInteger, primary_key=True)
+    email = sqla.Column(sqla.String, unique=True)
+    alias = sqla.Column(sqla.String)
+    pwhash = sqla.Column(sqla.String)
+    registration_date = sqla.Column(sqla.DateTime)
 
     def __repr__(self):
-        return "<User(id='{}', email='{}', alias='{}', registered={})>".\
-            format(self.id, self.email, self.alias, self.registration_date)
+        return "<User(id='{}', email='{}', alias='{}', registered=\'{}\')>"\
+            .format(self.id, self.email, self.alias, self.registration_date)
 
 def add_user(email, pw):
     now = datetime.now()
@@ -27,4 +27,6 @@ def add_user(email, pw):
     try:
         s.add(user)
         s.commit()
-    
+    except:
+        #FIXME find the error
+        raise()
