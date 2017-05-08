@@ -5,4 +5,6 @@ def test_create_connection():
 
 def test_in_memory_connection():
     from tradecraft.db import database
-
+    from sqlalchemy.engine.base import Connection
+    s = database.get_session(cfgpath='memory')
+    assert type(s.connection()) == Connection
