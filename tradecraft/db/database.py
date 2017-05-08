@@ -2,6 +2,7 @@
 
 import sqlalchemy as sqla
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 
 def create_engine(cfgpath='db.conf'):
     # Read the db.conf into a dictionary.
@@ -22,4 +23,6 @@ def create_engine(cfgpath='db.conf'):
     # Return a connection.
     return sqla.create_engine(connectionString, echo=True)
 
+engine = create_engine()
 Base = declarative_base()
+Session = sessionmaker(bind=engine)
