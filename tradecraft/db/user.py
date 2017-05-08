@@ -3,7 +3,7 @@ from datetime import datetime
 from hashlib import sha512
 
 from tradecraft.db.database import Base
-from tradecraft.db.database import session
+from tradecraft.db.database import get_session
 
 class User(Base):
     __tablename__ = 'users'
@@ -23,7 +23,7 @@ def add_user(email, pw):
     email = email.lower()
     pwhash = sha512(pw.encode())
     user = User(email=email, pwhash=pwhash, registration_date=now)
-    s = Session()
+    s = get_session()
     try:
         s.add(user)
         s.commit()
