@@ -13,7 +13,8 @@ def create_engine(cfgpath='db.conf'):
             conf[k] = v
     
     # Compile a connection string.
-    connectionString = 'postgresql+psycopg2://{}:{}@{}/{}'.format(
+    connectionString = '{}://{}:{}@{}/{}'.format(
+        conf['engine'],
         conf['user'],
         conf['password'],
         conf['host'],
@@ -25,4 +26,4 @@ def create_engine(cfgpath='db.conf'):
 
 engine = create_engine()
 Base = declarative_base()
-Session = sessionmaker(bind=engine)
+session = sessionmaker(bind=engine)
