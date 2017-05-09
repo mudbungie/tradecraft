@@ -6,14 +6,14 @@ from sqlalchemy.orm import sessionmaker
 
 Base = declarative_base()
 
-def create_engine(cfgpath):
-    if cfgpath == 'memory':
+def create_engine(cfg):
+    if cfg == 'memory':
         connectionString = 'sqlite:///:memory:'
     else:
         # Read the db.conf into a dictionary.
         conf = {}    
-        with open(cfgpath) as cfg:
-            for line in cfg.readlines():
+        with open(cfg) as cfgfile:
+            for line in cfgfile.readlines():
                 k, v = line.strip().split('=')[0:2]
                 conf[k] = v
         
@@ -29,8 +29,10 @@ def create_engine(cfgpath):
     # Return a connection.
     return sqla.create_engine(connectionString, echo=True)
 
-def get_session(cfgpath='db.conf'):
-    engine = create_engine(cfgpath)
+def get_session(engine):
+    #engine = create_engine(cfg)
     s = sessionmaker(bind=engine)
     return s()
 
+def create_tables(engine):
+    Base.metadata.create_all(engine)
