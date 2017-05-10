@@ -2,8 +2,7 @@ import sqlalchemy as sqla
 from datetime import datetime
 from hashlib import sha512
 
-from tradecraft.db.database import Base
-from tradecraft.db.database import get_session
+from tradecraft.db.database import Base, Database
 
 class User(Base):
     __tablename__ = 'users'
