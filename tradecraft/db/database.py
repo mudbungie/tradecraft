@@ -4,6 +4,11 @@ import sqlalchemy as sqla
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from contextlib import contextmanager
+from datetime import datetime
+from hashlib import sha512
+import re
+
+from tradecraft.exc import *
 
 Base = declarative_base()
 
@@ -37,6 +42,7 @@ class Database:
             raise
         finally:
             s.close()
+
     #
     ### SQL abstractions
     #
@@ -49,8 +55,18 @@ class Database:
     ### User table functions.
     # 
     def add_user(self, email, pw):
+        keyvals = {}
         now = datetime.now()
         email = email.lower()
+        if not re.match(r'(^[a-z0-9_.+-]+@[a-z0-9-]+\.[a-z0-9-.]+$)', email):
+            raise InvalidEmail
+        keyvals['email'] = email
+        keyvals['pwhash'] = sha512(pw.encode()).hexdigest()
+        keyvals['registration_date'] = now
+        try:
+            return self.insert('users', keyvals)
+        except sqla.exc.IntegrityError:
+            raise EmailAlreadyRegistered
 
 # Reads a config file's path into a connection string.        
 def read_engine_string(cfgpath='db.conf'):

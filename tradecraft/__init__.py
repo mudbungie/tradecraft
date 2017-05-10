@@ -1,5 +1,6 @@
 from . import api
 from . import db
+from . import exc
 import pkg_resources
 
 try:
