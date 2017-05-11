@@ -67,6 +67,11 @@ class Database:
             return self.insert('users', keyvals)
         except sqla.exc.IntegrityError:
             raise EmailAlreadyRegistered
+    
+    def get_user_by_email(self, email):
+        users = self.tables['users']
+        q = users.select(users.c.email == email)
+        return q.execute().first()
 
 # Reads a config file's path into a connection string.        
 def read_engine_string(cfgpath='db.conf'):

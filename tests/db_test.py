@@ -19,13 +19,10 @@ def test_table_create():
     db = database.Database('sqlite:///:memory:')
     assert db.e.table_names() == ['users']
 
-#def test_user_creation():
-#    from tradecraft.db import user, database
-#    e = database.create_engine('memory')
-#    database.create_tables(e)
-#    s = database.get_session(e)
-#    email = 'test@test.com'
-#    user.add_user(s, email, '1234')
-#    s.commit()
-#    assert user #FIXME actuall test
-#    s.close()
+def test_user_creation():
+    from tradecraft.db import user, database
+    email = 'a@b.c'
+    db = database.Database('sqlite:///:memory:')
+    db.add_user(email, '1234')
+    db.get_user_by_email(email)
+    assert db.get_user_by_email(email)
