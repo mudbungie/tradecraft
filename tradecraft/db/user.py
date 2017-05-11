@@ -16,17 +16,3 @@ class User(Base):
     def __repr__(self):
         return "<User(id='{}', email='{}', alias='{}', registered=\'{}\')>"\
             .format(self.id, self.email, self.alias, self.registration_date)
-
-# Returns the user id
-def add_user(s, email, pw):
-    now = datetime.now()
-    email = email.lower()
-    pwhash = sha512(pw.encode()).hexdigest()
-    user = User(email=email, pwhash=pwhash, registration_date=now, alias='test')
-    try:
-        s.add(user)
-        s.commit()
-    except:
-        #FIXME find the error for primary key conflict
-        raise
-
