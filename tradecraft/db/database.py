@@ -13,6 +13,24 @@ from tradecraft.exc import *
 
 Base = declarative_base()
 
+# Reads a config file's path into a connection string.        
+def read_engine_string(cfgpath='db.conf'):
+    conf = {}    
+    with open(cfgpath) as cfgfile:
+        for line in cfgfile.readlines():
+            k, v = line.strip().split('=')[0:2]
+            conf[k] = v
+    
+    # Compile a connection string.
+    connection_string = '{}://{}:{}@{}/{}'.format(
+        conf['engine'],
+        conf['user'],
+        conf['password'],
+        conf['host'],
+        conf['dbname']
+        )
+    return connection_string
+
 class Database:
 
     def __init__(self, connection_string):
@@ -85,25 +103,6 @@ class Database:
     def get_user_token(self, email, pw):
         pass
         #FIXME  NOT DONE
-
-# Reads a config file's path into a connection string.        
-def read_engine_string(cfgpath='db.conf'):
-    conf = {}    
-    with open(cfgpath) as cfgfile:
-        for line in cfgfile.readlines():
-            k, v = line.strip().split('=')[0:2]
-            conf[k] = v
-    
-    # Compile a connection string.
-    connection_string = '{}://{}:{}@{}/{}'.format(
-        conf['engine'],
-        conf['user'],
-        conf['password'],
-        conf['host'],
-        conf['dbname']
-        )
-    return connection_string
-
 
 ###
 ### Table definitions
