@@ -5,7 +5,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from contextlib import contextmanager
 from datetime import datetime
-from hashlib import sha512
+from passlib.hash import pbkdf2_sha512
 from uuid import uuid4
 import re
 
@@ -62,7 +62,7 @@ class Database:
         if not re.match(r'(^[a-z0-9_.+-]+@[a-z0-9-]+\.[a-z0-9-.]+$)', email):
             raise InvalidEmail
         keyvals['email'] = email
-        keyvals['pwhash'] = sha512(pw.encode()).hexdigest()
+        keyvals['pwhash'] = pbkdf2_sha512.hash(pw)
         keyvals['registration_date'] = now
         try:
             return self.insert('users', keyvals)
@@ -74,9 +74,17 @@ class Database:
         q = users.select(users.c.email == email)
         return q.execute().first()
 
-    def get_user_token(self, email, password):
+    def verify_credentials(self, email, pw):
+        user = self.get_user_by_email(email)
+        if not user:
+            raise NoSuchUser
+        if not user.pwhash:
+            pass
+        #FIXME NOT DONE
+        
+    def get_user_token(self, email, pw):
         pass
-
+        #FIXME  NOT DONE
 
 # Reads a config file's path into a connection string.        
 def read_engine_string(cfgpath='db.conf'):
