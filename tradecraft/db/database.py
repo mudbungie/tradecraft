@@ -6,6 +6,7 @@ from sqlalchemy.orm import sessionmaker
 from contextlib import contextmanager
 from datetime import datetime
 from hashlib import sha512
+from uuid import uuid4
 import re
 
 from tradecraft.exc import *
@@ -73,6 +74,10 @@ class Database:
         q = users.select(users.c.email == email)
         return q.execute().first()
 
+    def get_user_token(self, email, password):
+        pass
+
+
 # Reads a config file's path into a connection string.        
 def read_engine_string(cfgpath='db.conf'):
     conf = {}    
@@ -91,3 +96,30 @@ def read_engine_string(cfgpath='db.conf'):
         )
     return connection_string
 
+
+###
+### Table definitions
+###
+
+# User accounts.
+class User(Base):
+    __tablename__ = 'users'
+
+    id = sqla.Column(sqla.Integer, primary_key=True, autoincrement=True)
+    email = sqla.Column(sqla.String, unique=True)
+    alias = sqla.Column(sqla.String, nullable=True)
+    pwhash = sqla.Column(sqla.String)
+    registration_date = sqla.Column(sqla.DateTime)
+
+    def __repr__(self):
+        return "<User(id='{}', email='{}', alias='{}', registered=\'{}\')>"\
+            .format(self.id, self.email, self.alias, self.registration_date)
+
+# Ephemeral authentication tokens for user activity.
+class Token(Base):
+    __tablename__ = 'tokens'
+
+    id = sqla.Column(sqla.Integer, primary_key=True, autoincrement=True)
+    user_id = sqla.Column(sqla.Integer, sqla.ForeignKey('users.id'))
+    uuid = sqla.Column(sqla.String)
+    issue_date = sqla.Column(sqla.DateTime)

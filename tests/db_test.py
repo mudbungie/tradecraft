@@ -15,12 +15,12 @@ def test_in_memory_connection():
         assert type(s.connection()) == Connection
 
 def test_table_create():
-    from tradecraft.db import user, database
+    from tradecraft.db import database
     db = database.Database('sqlite:///:memory:')
-    assert db.e.table_names() == ['users']
+    assert 'users' in db.e.table_names()
 
 def test_user_creation():
-    from tradecraft.db import user, database
+    from tradecraft.db import database
     email = 'a@b.c'
     db = database.Database('sqlite:///:memory:')
     db.add_user(email, '1234')

@@ -75,3 +75,6 @@ database schema:
         pwhash sha512
         registration_date
         email_confirmed
+
+to do:
+    user/user-id mapping system
