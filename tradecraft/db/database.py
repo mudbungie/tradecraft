@@ -78,9 +78,9 @@ class Database:
         user = self.get_user_by_email(email)
         if not user:
             raise NoSuchUser
-        if not user.pwhash:
-            pass
-        #FIXME NOT DONE
+        if pbkdf2_sha512.verify(pw, user.pwhash):
+            return True
+        return False
         
     def get_user_token(self, email, pw):
         pass

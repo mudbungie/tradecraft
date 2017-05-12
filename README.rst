@@ -3,17 +3,12 @@ tradecraft
 ==========
 
 
-Add a short description here!
+This is mainly a coding exercise, but is ostensibly a clandestine ARG.
 
 
 Description
 ===========
 
-A longer description of your project goes here...
+The idea is to have an ARG which can be played without letting others nearby
+know that you are playing. More if more happens.
 
-
-Note
-====
-
-This project has been set up using PyScaffold 2.5.7. For details and usage
-information on PyScaffold see http://pyscaffold.readthedocs.org/.
