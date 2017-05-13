@@ -97,12 +97,20 @@ class Database:
         if not user:
             raise NoSuchUser
         if pbkdf2_sha512.verify(pw, user.pwhash):
-            return True
+            return user.id
         return False
         
     def get_user_token(self, email, pw):
-        pass
-        #FIXME  NOT DONE
+        user_id = self.verify_credentials(email, pw)
+        if not user_id:
+            raise IncorrectPassword
+        uuid = uuid4().hex
+        keyvals = {'issue_date':datetime.now(),
+            'uuid':uuid,
+            'user_id':user_id,
+            }
+        self.insert('tokens', keyvals)
+        return uuid
 
 ###
 ### Table definitions

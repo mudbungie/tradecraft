@@ -33,3 +33,9 @@ def test_user_creation():
     add_test_user(db)
     assert db.get_user_by_email(test_email).email == test_email
 
+def test_user_token():
+    import re
+    db = get_memory_db()
+    add_test_user(db)
+    uuidre = re.compile(r'^[0-9a-f]{32}$')
+    assert uuidre.match(db.get_user_token(test_email, test_password))
