@@ -3,22 +3,22 @@ test_password = '1234'
 
 # Creates a connection to the psql database. 
 def test_create_connection():
-    from tradecraft.db import database
+    from tradecraft.db import Database, read_engine_string
     from sqlalchemy.engine.base import Connection
-    conn_string = database.read_engine_string()
-    db = database.Database(conn_string)
+    conn_string = read_engine_string()
+    db = Database(conn_string)
     with db.get_session() as s:
         assert type(s.connection()) == Connection
 
 def get_memory_db():
-    from tradecraft.db import database
-    return database.Database('sqlite:///:memory:')
+    from tradecraft.db import Database
+    return Database('sqlite:///:memory:')
 
 def add_test_user(db):
     db.add_user(test_email, test_password)
 
 def test_in_memory_connection():
-    from tradecraft.db import database
+    from tradecraft.db import Database
     from sqlalchemy.engine.base import Connection
     db = get_memory_db()
     with db.get_session() as s:

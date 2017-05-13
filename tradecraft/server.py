@@ -5,6 +5,8 @@
 from bottle import get, post, request, run
 from api import user
 
+from tradecraft.db import Database, read_engine_string
+
 ### Utility
 # Just gets values corresponding to keys from request.
 def get_values(request, keys):
@@ -43,4 +45,5 @@ def run_server():
     run(host='127.0.0.1', port=8000)
 
 if __name__ == '__main__':
+    db = Database(read_engine_string())
     run_server()
