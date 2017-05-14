@@ -21,8 +21,14 @@ def get_values(request, keys):
 #
 @post('/register')
 def register():
-    email = get_values(request, ['email'])
-    return json.dumps(user.account_exists(email))
+    email, password = get_values(request, ['email'])
+    try:
+        db.add_user(email, password)
+    except InvalidEmail:
+        return 'invalid_email'
+    except EmailAlreadyRegistered:
+        return 'already_registered'
+    return 'success'
 
 @post('/register/new')
 def register_new():
