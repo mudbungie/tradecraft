@@ -3,7 +3,7 @@
 # Actual application server. Answers calls from clients, according to API.
 
 from bottle import get, post, request, run
-from api import user
+import json
 
 from tradecraft.db import Database, read_engine_string
 
