@@ -86,6 +86,12 @@ class Database:
             return self.insert('users', keyvals)
         except sqla.exc.IntegrityError:
             raise EmailAlreadyRegistered
+
+    def delete_user(self, user_id):
+        with self.get_session() as s:
+            user = s.query(self.tables['users']).filter_by(id=user_id)
+            s.delete(user)
+            #FIXME NOT DONE
     
     def get_user_by_email(self, email):
         users = self.tables['users']
