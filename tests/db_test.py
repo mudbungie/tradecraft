@@ -4,7 +4,7 @@ test_password = '1234'
 # Creates a database connection.
 def get_db():
     from tradecraft.db import Database, read_engine_string
-    conn_string = read_engine_string
+    conn_string = read_engine_string()
     return Database(conn_string)
 
 # Creates a connection to the psql database. 
