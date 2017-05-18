@@ -89,14 +89,22 @@ class Database:
 
     def delete_user(self, user_id):
         with self.get_session() as s:
-            user = s.query(self.tables['users']).filter_by(id=user_id)
-            s.delete(user)
-            #FIXME NOT DONE
+            # Clean up all tokens first.
+            tokens = self.tables['tokens']
+            q = tokens.delete(tokens.c.user_id==user_id)
+            q.execute()
+
+            users = self.tables['users']
+            q = users.delete(users.c.id==user_id)
+            q.execute()
     
     def get_user_by_email(self, email):
         users = self.tables['users']
         q = users.select(users.c.email == email)
         return q.execute().first()
+
+    def delete_user_by_email(self, email):
+        self.delete_user(self.get_user_by_email(email).id)
 
     def verify_credentials(self, email, pw):
         user = self.get_user_by_email(email)

@@ -16,9 +16,6 @@ def test_create_connection():
     with db.get_session() as s:
         assert type(s.connection()) == Connection
 
-def add_test_user(db):
-    db.add_user(test_email, test_password)
-
 def test_in_memory_connection():
     from tradecraft.db import Database
     from sqlalchemy.engine.base import Connection
@@ -32,12 +29,16 @@ def test_table_create():
 
 def test_user_creation():
     db = get_db()
-    add_test_user(db)
-    assert db.get_user_by_email(test_email).email == test_email
+    db.add_user(test_email, test_password)
+    email = db.get_user_by_email(test_email).email
+    db.delete_user_by_email(test_email)
+    assert email == test_email
 
 def test_user_token():
     import re
     db = get_db()
-    add_test_user(db)
+    db.add_user(test_email, test_password)
     uuidre = re.compile(r'^[0-9a-f]{32}$')
-    assert uuidre.match(db.get_user_token(test_email, test_password))
+    token = db.get_user_token(test_email, test_password)
+    db.delete_user_by_email(test_email)
+    assert uuidre.match(token)
