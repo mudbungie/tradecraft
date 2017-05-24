@@ -15,7 +15,6 @@ def get_values(request, keys):
         values.append(request.forms.get(key))
     return values
 
-
 #
 # Registration functions.
 #
@@ -33,15 +32,25 @@ def register():
 @post('/register/new')
 def register_new():
     email, password = get_values(request, ['email', 'password'])
+    try:
+        db.add_user(email, password)
+    except InvalidEmail:
+        return json.dumps('invalid_email')
+    except EmailAlreadyRegistered:
+        return json.dumps('email_already_registered')
     registered = user.register(email, password) # Does validity checking.
     if registered:
         user.send_confirmation(email)
     return json.dumps(registered)
 
-@post
+@post('/login')
 def login():
     email, password = get_values(request, ['email', 'password'])
-    return user.login(email, password) # Gives a token
+    try:
+        token = db.get_email_token(email, password)
+    except IncorrectPassword:
+        return json.dumps(False)
+    return db.get_user_token(email, password) # Gives a token
 
 @get('/')
 def server_online():

@@ -73,6 +73,7 @@ class Database:
     #
     ### User table functions.
     # 
+    # Returns the insert query, raises InvalidEmail, EmailAlreadyRegistered.
     def add_user(self, email, pw):
         keyvals = {}
         now = datetime.now()
