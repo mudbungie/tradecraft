@@ -6,6 +6,7 @@ from bottle import get, post, request, run
 import json
 
 from tradecraft.db import Database, read_engine_string
+from tradecraft.exc import *
 
 ### Utility
 # Just gets values corresponding to keys from request.
@@ -21,6 +22,8 @@ def get_values(request, keys):
 @post('/register')
 def register():
     email, password = get_values(request, ['email', 'password'])
+    if not email or not password:
+        return json.dumps({'status':'invalid_submission'})
     try:
         db.add_user(email, password)
     except InvalidEmail:
@@ -32,10 +35,14 @@ def register():
 @post('/login')
 def login():
     email, password = get_values(request, ['email', 'password'])
+    if not email or not password:
+        return json.dumps({'status':'invalid_submission'})
     try:
-        token = db.get_email_token(email, password)
+        token = db.get_user_token(email, password)
+        return json.dumps({'status':'success', 
+            'auth_token':token})
     except IncorrectPassword:
-        return json.dumps(False)
+        return json.dumps({'status':'incorrect_password'})
     return db.get_user_token(email, password) # Gives a token
 
 @get('/')

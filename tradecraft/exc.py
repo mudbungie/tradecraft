@@ -5,3 +5,5 @@ class EmailAlreadyRegistered(Exception):
 class InvalidEmail(Exception):
     pass
 
+class IncorrectPassword(Exception):
+    pass
