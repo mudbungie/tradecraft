@@ -31,6 +31,10 @@ def read_engine_string(cfgpath='db.conf'):
         )
     return connection_string
 
+def get_db():
+    conn_string = read_engine_string()
+    return Database(conn_string)
+
 class Database:
 
     def __init__(self, connection_string):

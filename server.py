@@ -20,28 +20,14 @@ def get_values(request, keys):
 #
 @post('/register')
 def register():
-    email, password = get_values(request, ['email'])
-    try:
-        db.add_user(email, password)
-    except InvalidEmail:
-        return 'invalid_email'
-    except EmailAlreadyRegistered:
-        return 'already_registered'
-    return 'success'
-
-@post('/register/new')
-def register_new():
     email, password = get_values(request, ['email', 'password'])
     try:
         db.add_user(email, password)
     except InvalidEmail:
-        return json.dumps('invalid_email')
+        return json.dumps({'status':'invalid_email'})
     except EmailAlreadyRegistered:
-        return json.dumps('email_already_registered')
-    registered = user.register(email, password) # Does validity checking.
-    if registered:
-        user.send_confirmation(email)
-    return json.dumps(registered)
+        return json.dumps({'status':'already_registered'})
+    return json.dumps({'status':'success'})
 
 @post('/login')
 def login():
