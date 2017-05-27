@@ -99,6 +99,12 @@ class Database:
             q = tokens.delete(tokens.c.user_id==user_id)
             q.execute()
 
+            # Clean up pending email confirmations.
+            e_confirm = self.tables['email_confirmation']
+            q = e_confirm.delete(e_confirm.c.user_id==user_id)
+            q.execute()
+
+            # Delete the user itself.
             users = self.tables['users']
             q = users.delete(users.c.id==user_id)
             q.execute()
@@ -109,7 +115,12 @@ class Database:
         return q.execute().first()
 
     def delete_user_by_email(self, email):
-        self.delete_user(self.get_user_by_email(email).id)
+        try:
+            user_id = self.get_user_by_email(email).id
+        except AttributeError: # No such user
+            return False
+        self.delete_user(user_id)
+        return True
 
     def verify_credentials(self, email, pw):
         user = self.get_user_by_email(email)
@@ -157,3 +168,12 @@ class Token(Base):
     user_id = sqla.Column(sqla.Integer, sqla.ForeignKey('users.id'))
     uuid = sqla.Column(sqla.String)
     issue_date = sqla.Column(sqla.DateTime)
+
+class Email_Confirmation(Base):
+    __tablename__ = 'email_confirmation'
+
+    id = sqla.Column(sqla.Integer, primary_key=True, autoincrement=True)
+    user_id = sqla.Column(sqla.Integer, sqla.ForeignKey('users.id'))
+    uuid = sqla.Column(sqla.String)
+    creation_date = sqla.Column(sqla.DateTime)
+    

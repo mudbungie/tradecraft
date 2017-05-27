@@ -77,4 +77,11 @@ database schema:
         email_confirmed
 
 to do:
-    user/user-id mapping system
+    email confirmation system
+        so, a user signs up
+        a uuid is created, stored in a table: "email_registrations"
+            email_registration schema:
+                user_id
+                uuid
+                creation_date
+

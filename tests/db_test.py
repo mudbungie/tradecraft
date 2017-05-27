@@ -7,6 +7,12 @@ def get_db():
     conn_string = read_engine_string()
     return Database(conn_string)
 
+# Not actually a test. Just cleaning up in case tests failed earlier.
+def test_pre_cleanup():
+    db = get_db()
+    db.delete_user_by_email(test_email)
+    assert True
+
 # Creates a connection to the psql database. 
 def test_create_connection():
     from tradecraft.db import Database, read_engine_string
