@@ -46,13 +46,18 @@ def login():
     return db.get_user_token(email, password) # Gives a token
 
 # For approving email accounts, by following links in email.
+# reg_id should be a valid uuid, registered to the system.
 @get('/confirm/<reg_id>')
 def confirm(reg_id):
     uuidre = re.compile(r'[a-f0-9]{32}')
     if uuid.match(reg_id):
-        status = db.confirm_email(email)    
-        return json.dumps({'status':status})
-    # If not, why send a response at all?
+        status = db.confirm_email(reg_id)    
+        if status:
+            return json.dumps({'status':'success'})
+        else:
+            return json.dumps({'status':'no_such_uuid'})
+    else:
+        return json.dumps({'status':'invalid_uuid'})
 
 @get('/')
 def server_online():

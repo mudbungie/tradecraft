@@ -2,7 +2,7 @@
 
 import sqlalchemy as sqla
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, relationship
 from contextlib import contextmanager
 from datetime import datetime
 from passlib.hash import pbkdf2_sha512
@@ -84,18 +84,27 @@ class Database:
     # 
     # Returns the insert query, raises InvalidEmail, EmailAlreadyRegistered.
     def add_user(self, email, pw):
-        keyvals = {}
-        now = datetime.now()
+        # Validate the email first.
         email = email.lower()
         if not re.match(r'(^[a-z0-9_.+-]+@[a-z0-9-]+\.[a-z0-9-.]+$)', email):
             raise InvalidEmail
-        keyvals['email'] = email
-        keyvals['pwhash'] = pbkdf2_sha512.hash(pw)
-        keyvals['registration_date'] = now
+        now = datetime.now()
+        user = User(email=email, pwhash=pbkdf2_sha512.hash(pw), 
+            registration_date=now)
         try:
-            return self.insert('users', keyvals)
+            with self.get_session() as s:
+                s.add(user)
+                s.flush()
+                uid = user.id
+                confirmation = Email_Confirmation(user_id=uid, creation_date=now,
+                    uuid=str(uuid4()))
+                s.add(confirmation)
+                s.commit()
+                return confirmation.uuid
         except sqla.exc.IntegrityError:
             raise EmailAlreadyRegistered
+        # Also, add confirmation key.
+        #confirmation = Email_Confirmation()
 
     def delete_user(self, user_id):
         with self.get_session() as s:
@@ -147,29 +156,42 @@ class Database:
         self.insert('tokens', keyvals)
         return uuid
 
+    # Really just for internal testing.
+    def get_registration_key_by_email(self, email):
+        try:
+            user_id = self.get_user_by_email(email).id
+        except AttributeError:
+            raise
+            # No such email
+            return False
+        pending_confirmations = self.tables['pending_email_confirmations']
+        with self.get_session() as s:
+            confirmation = s.query(pending_confirmations).\
+                filter(pending_confirmations.c.user_id==user_id).first()
+            try:
+                key = confirmation.uuid
+                return key
+            except AttributeError:
+                raise
+                # No rows
+                return False
+
     def confirm_email(self, uuid):
         pending_confirmations = self.tables['pending_email_confirmations']
         users = self.tables['users']
         with self.get_session() as s:
             confirmation = s.query(pending_confirmations).\
-                filter(pending_confirmations.c.uuid==uuid)
-            
-            
-        confirmation = self
-        q = pending_confirmations.select(pending_confirmations.c.uuid==uuid)
-        confirmation = q.execute().first()
-        # No rows: return False.
-        if not confirmation:
-            return False
-        uid = confirmation.user_id
-        # Get the user, authorize it.
-        q = users.select(users.c.id==uid)
-        user = q.execute.first()
-        with self.get_session() as s:
-            s.add(user)
+                filter(pending_confirmations.c.uuid==uuid).first()
+            try:
+                uid = confirmation.user_id
+            except AttributeError:
+                # No rows: return False.
+                return False
+            user = s.query(users).filter(users.c.id==uid).first()
             user.authorized = True
+            s.delete(confirmation)
             s.commit()
-        
+
         return True
 
 ###
@@ -186,6 +208,9 @@ class User(Base):
     pwhash = sqla.Column(sqla.String)
     registration_date = sqla.Column(sqla.DateTime)
     authorized = sqla.Column(sqla.Boolean, default=False)
+
+    tokens = relationship('Token', cascade='delete')
+    email_confirmations = relationship('Email_Confirmation', cascade='delete')
 
     def __repr__(self):
         return "<User(id='{}', email='{}', alias='{}', registered=\'{}\')>"\
