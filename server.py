@@ -45,6 +45,15 @@ def login():
         return json.dumps({'status':'incorrect_password'})
     return db.get_user_token(email, password) # Gives a token
 
+# For approving email accounts, by following links in email.
+@get('/confirm/<reg_id>')
+def confirm(reg_id):
+    uuidre = re.compile(r'[a-f0-9]{32}')
+    if uuid.match(reg_id):
+        status = db.confirm_email(email)    
+        return json.dumps({'status':status})
+    # If not, why send a response at all?
+
 @get('/')
 def server_online():
     return json.dumps(True)

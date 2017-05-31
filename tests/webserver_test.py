@@ -5,7 +5,12 @@ localhost_string = 'http://127.0.0.1:8000/'
 ###IMPORTANT
 # All tests in this module require the webserver to be running.
 
-# Still gonna need DB connections to validate insertions and regress changes.
+# Not actually a test. Just cleaning up in case tests failed earlier.
+def test_pre_cleanup():
+    from tradecraft.db import get_db
+    db = get_db()
+    db.delete_user_by_email(test_email)
+    assert True
 
 # Verify that the connection is working at all.
 def test_server():

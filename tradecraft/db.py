@@ -100,7 +100,7 @@ class Database:
             q.execute()
 
             # Clean up pending email confirmations.
-            e_confirm = self.tables['email_confirmation']
+            e_confirm = self.tables['pending_email_confirmations']
             q = e_confirm.delete(e_confirm.c.user_id==user_id)
             q.execute()
 
@@ -117,10 +117,10 @@ class Database:
     def delete_user_by_email(self, email):
         try:
             user_id = self.get_user_by_email(email).id
+            self.delete_user(user_id)
+            return True
         except AttributeError: # No such user
             return False
-        self.delete_user(user_id)
-        return True
 
     def verify_credentials(self, email, pw):
         user = self.get_user_by_email(email)
@@ -142,6 +142,31 @@ class Database:
         self.insert('tokens', keyvals)
         return uuid
 
+    def confirm_email(self, uuid):
+        pending_confirmations = self.tables['pending_email_confirmations']
+        users = self.tables['users']
+        with self.get_session() as s:
+            confirmation = s.query(pending_confirmations).\
+                filter(pending_confirmations.c.uuid==uuid)
+            
+            
+        confirmation = self
+        q = pending_confirmations.select(pending_confirmations.c.uuid==uuid)
+        confirmation = q.execute().first()
+        # No rows: return False.
+        if not confirmation:
+            return False
+        uid = confirmation.user_id
+        # Get the user, authorize it.
+        q = users.select(users.c.id==uid)
+        user = q.execute.first()
+        with self.get_session() as s:
+            s.add(user)
+            user.authorized = True
+            s.commit()
+        
+        return True
+
 ###
 ### Table definitions
 ###
@@ -155,6 +180,7 @@ class User(Base):
     alias = sqla.Column(sqla.String, nullable=True)
     pwhash = sqla.Column(sqla.String)
     registration_date = sqla.Column(sqla.DateTime)
+    authorized = sqla.Column(sqla.Boolean, default=False)
 
     def __repr__(self):
         return "<User(id='{}', email='{}', alias='{}', registered=\'{}\')>"\
@@ -170,10 +196,10 @@ class Token(Base):
     issue_date = sqla.Column(sqla.DateTime)
 
 class Email_Confirmation(Base):
-    __tablename__ = 'email_confirmation'
+    __tablename__ = 'pending_email_confirmations'
 
     id = sqla.Column(sqla.Integer, primary_key=True, autoincrement=True)
     user_id = sqla.Column(sqla.Integer, sqla.ForeignKey('users.id'))
-    uuid = sqla.Column(sqla.String)
+    uuid = sqla.Column(sqla.String, unique=True)
     creation_date = sqla.Column(sqla.DateTime)
     
