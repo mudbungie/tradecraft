@@ -8,10 +8,15 @@ from datetime import datetime
 from passlib.hash import pbkdf2_sha512
 from uuid import uuid4
 import re
+import logging
 
 from tradecraft.exc import *
 
 Base = declarative_base()
+
+sqla_logger = logging.getLogger('sqlalchemy')
+sqla_logger.propagate = False
+sqla_logger.addHandler(logging.FileHandler('sqla.log'))
 
 # Reads a config file's path into a connection string.        
 def read_engine_string(cfgpath='db.conf'):
