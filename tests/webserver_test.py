@@ -49,15 +49,14 @@ def test_login():
     uuidre = re.compile(r'^[0-9a-f]{32}$')
     assert uuidre.match(r.json()['auth_token'])
 
-'''
 def test_confirm_email():
     import requests
     from tradecraft.db import get_db
     register_test_user()
     db = get_db()
     registration_uuid = db.get_registration_key_by_email(test_email)
-    r = requests.get(localhost_string + 'confirmation/' + registration_uuid)
-    authorized = db.get_user_by_email(test_email).authorized
+    r = requests.get(localhost_string + 'confirm/' + registration_uuid)
+    user = db.get_user_by_email(test_email)
+    authorized = user.authorized
     delete_test_user()
-    assert user.authorized == True
-'''
+    assert authorized == True

@@ -4,6 +4,7 @@
 
 from bottle import get, post, request, run
 import json
+import re
 
 from tradecraft.db import Database, read_engine_string
 from tradecraft.exc import *
@@ -49,8 +50,9 @@ def login():
 # reg_id should be a valid uuid, registered to the system.
 @get('/confirm/<reg_id>')
 def confirm(reg_id):
+    print(reg_id)
     uuidre = re.compile(r'[a-f0-9]{32}')
-    if uuid.match(reg_id):
+    if uuidre.match(reg_id):
         status = db.confirm_email(reg_id)    
         if status:
             return json.dumps({'status':'success'})

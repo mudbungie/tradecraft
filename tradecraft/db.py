@@ -96,15 +96,14 @@ class Database:
                 s.add(user)
                 s.flush()
                 uid = user.id
-                confirmation = Email_Confirmation(user_id=uid, creation_date=now,
-                    uuid=str(uuid4()))
+                # Add a confirmation key to pending_email_confirmations table
+                confirmation = Email_Confirmation(user_id=uid, 
+                    creation_date=now, uuid=uuid4().hex)
                 s.add(confirmation)
                 s.commit()
                 return confirmation.uuid
         except sqla.exc.IntegrityError:
             raise EmailAlreadyRegistered
-        # Also, add confirmation key.
-        #confirmation = Email_Confirmation()
 
     def delete_user(self, user_id):
         with self.get_session() as s:
@@ -180,15 +179,25 @@ class Database:
         pending_confirmations = self.tables['pending_email_confirmations']
         users = self.tables['users']
         with self.get_session() as s:
-            confirmation = s.query(pending_confirmations).\
-                filter(pending_confirmations.c.uuid==uuid).first()
+            #confirmation = s.query(pending_confirmations).\
+            confirmation = s.query(Email_Confirmation).\
+                filter_by(uuid=uuid).one()
+                #filter(pending_confirmations.c.uuid==uuid).one()
             try:
                 uid = confirmation.user_id
             except AttributeError:
                 # No rows: return False.
                 return False
-            user = s.query(users).filter(users.c.id==uid).first()
+
+            #users.update().values(authorized=True).where(users.c.id==uid)
+            #s.query(users).filter(users.c.id==uid).\
+            #    update({'authorized':True})
+            #user = s.query(users).filter(users.c.id==uid).first()
+            #user.authorized = True
+            user = s.query(User).filter(User.id==uid).one()
             user.authorized = True
+
+            pending_confirmations.delete().where
             s.delete(confirmation)
             s.commit()
 
