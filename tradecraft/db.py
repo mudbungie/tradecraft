@@ -189,15 +189,9 @@ class Database:
                 # No rows: return False.
                 return False
 
-            #users.update().values(authorized=True).where(users.c.id==uid)
-            #s.query(users).filter(users.c.id==uid).\
-            #    update({'authorized':True})
-            #user = s.query(users).filter(users.c.id==uid).first()
-            #user.authorized = True
             user = s.query(User).filter(User.id==uid).one()
             user.authorized = True
 
-            pending_confirmations.delete().where
             s.delete(confirmation)
             s.commit()
 
