@@ -84,4 +84,12 @@ to do:
                 user_id
                 uuid
                 creation_date
+    frontend interface
+
+actual application functionality design:
+    decoding of the code happens on client device.
+    all codes are just a URL with a uuid
+    if request comes in from not app, send to homepage
+
+    
 

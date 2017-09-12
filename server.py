@@ -9,6 +9,9 @@ import re
 from tradecraft.db import Database, read_engine_string
 from tradecraft.exc import *
 
+from tradecraft import log
+logger = log.logger.getChild('webserver')
+
 ### Utility
 # Just gets values corresponding to keys from request.
 def get_values(request, keys):
@@ -50,6 +53,7 @@ def login():
 # reg_id should be a valid uuid, registered to the system.
 @get('/confirm/<reg_id>')
 def confirm(reg_id):
+    logger.debug(reg_id)
     print(reg_id)
     uuidre = re.compile(r'[a-f0-9]{32}')
     if uuidre.match(reg_id):
@@ -60,6 +64,17 @@ def confirm(reg_id):
             return json.dumps({'status':'no_such_uuid'})
     else:
         return json.dumps({'status':'invalid_uuid'})
+
+# The basic application functionality: handle a uuid.
+@get('/app/<value>')
+def payload(value):
+    logger.debug('Received application payload {}'.format(value))
+    # Make sure that it's a valid uuid.
+    if not payload.validate(value):
+        logger.debug('Bad value in payload: {}'.format(value))
+    return json.dumps({'status':'invalid_submission'})
+
+
 
 @get('/')
 def server_online():

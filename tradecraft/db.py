@@ -8,15 +8,13 @@ from datetime import datetime
 from passlib.hash import pbkdf2_sha512
 from uuid import uuid4
 import re
-import logging
 
 from tradecraft.exc import *
 
-Base = declarative_base()
+from tradecraft import log
+logger = log.logger.getChild('db')
 
-sqla_logger = logging.getLogger('sqlalchemy')
-sqla_logger.propagate = False
-sqla_logger.addHandler(logging.FileHandler('sqla.log'))
+Base = declarative_base()
 
 # Reads a config file's path into a connection string.        
 def read_engine_string(cfgpath='db.conf'):
@@ -103,6 +101,7 @@ class Database:
                 s.commit()
                 return confirmation.uuid
         except sqla.exc.IntegrityError:
+            logger.info('Email already registered: {}'.format(email))
             raise EmailAlreadyRegistered
 
     def delete_user(self, user_id):
@@ -175,6 +174,7 @@ class Database:
                 # No rows
                 return False
 
+    # When a user clicks the link in the email to confirm that it is real.
     def confirm_email(self, uuid):
         pending_confirmations = self.tables['pending_email_confirmations']
         users = self.tables['users']
@@ -228,6 +228,8 @@ class Token(Base):
     uuid = sqla.Column(sqla.String)
     issue_date = sqla.Column(sqla.DateTime)
 
+
+# Pending email confirmation uuids. Must be in here to confirm a user.
 class Email_Confirmation(Base):
     __tablename__ = 'pending_email_confirmations'
 
@@ -236,3 +238,11 @@ class Email_Confirmation(Base):
     uuid = sqla.Column(sqla.String, unique=True)
     creation_date = sqla.Column(sqla.DateTime)
     
+# Locations for the drops
+'''
+class Drop_Site(Base):
+    __tablename__ = 'drop_sites'
+
+    id = sqla.Column(sqla.Integer, primary_key=True, autoincrement=True)
+    uuid = sqa.Column(sqla.String, unique=True, x`)
+'''
