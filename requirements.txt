@@ -6,4 +6,3 @@ passlib==1.7.1
 psycopg2==2.7.1
 requests
 SQLAlchemy==1.1.9
-urllib3==1.22
